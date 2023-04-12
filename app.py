@@ -29,8 +29,6 @@ class Employee(db.Model):
         self.last_name = last_name
         self.role = role
         self.position = position
-
-    
     
 class Role(db.Model):
     role_id = db.Column(db.Integer, primary_key = True)
@@ -45,9 +43,23 @@ class Position(db.Model):
     
     def __init__(self, position_name):
         self.position_name = position_name
+
+class Courses(db.Model):
+    course_id = db.Column(db.Integer, primary_key = True)
+    course_name = db.Column(db.Text, nullable = False)
+
+    def __init__(self, course_name):
+        self.course_name = course_name
     
+course_lisenters = db.Table('course_lisenters',
+                            db.Column('lisenter_id', db.Integer, db.ForeignKey('employee.user_id')),
+                            db.Column('course_id', db.Integer, db.ForeignKey('courses.course_id')),
+                            db.Column('is_done', db.Boolean))
+
+
 @app.route('/')
 def home():
+    course = course_lisenters.query.add(1, 1,)
     userList = db.session.query(Employee.first_name, Position.position_name).join(Position).all()
     print(userList)
     return render_template('index.html', user = userList)
