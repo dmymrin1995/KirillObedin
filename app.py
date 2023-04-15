@@ -1,11 +1,15 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import ForeignKey, select
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:admin@localhost:5432/techucheba"
 db = SQLAlchemy(app)
 
+
+migrate = Migrate(app, db)
+migrate.init_app(app, db)
 
 class Employee(db.Model):
     user_id = db.Column(db.Integer, primary_key = True)
@@ -59,15 +63,15 @@ course_lisenters = db.Table('course_lisenters',
 
 @app.route('/')
 def home():
-    course = course_lisenters.query.add(1, 1,)
-    userList = db.session.query(Employee.first_name, Position.position_name).join(Position).all()
+    userList = db.session.query(Employee.first_name, Employee.last_name, Position.position_name).join(Position).all()
     print(userList)
     return render_template('index.html', user = userList)
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
+       db.create_all()
     app.run(debug=True)
+
     
 
 
